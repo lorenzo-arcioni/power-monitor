@@ -626,7 +626,7 @@ footer{
     <div class="sec-head">
       <span class="sec-title">Analisi costi</span>
       <span class="sec-line"></span>
-      <span class="sec-badge">€/kWh: <input id="priceInput" type="number" value="0.25" step="0.01" min="0.01"
+      <span class="sec-badge">€/kWh: <input id="priceInput" type="number" value="0.190262" step="0.01" min="0.01"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--t1);
         font-family:var(--mono);font-size:.65rem;padding:.1rem .3rem;width:50px"
         onchange="loadCost()"></span>
@@ -1054,7 +1054,7 @@ const loadForecast = async () => {
 
 // Costi
 const loadCost = async () => {
-  const price = parseFloat(document.getElementById('priceInput').value)||0.25;
+  const price = parseFloat(document.getElementById('priceInput').value)||0.190262;
   try {
     const r = await fetch(`${API}/analytics/cost?price=${price}`);
     const d = await r.json();
