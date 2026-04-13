@@ -479,7 +479,7 @@ footer{
         </svg>
         <div class="g-val" style="color:#a89060"><span id="gWv">–</span><small>W</small></div>
       </div>
-      <div class="g-range">0 – 2300 W</div>
+      <div class="g-range">0 – 3000 W</div>
     </div>
     <div class="g-card">
       <div class="g-label">Fattore di Potenza</div>
@@ -864,7 +864,7 @@ const fetchLatest = async () => {
     setText('bE',  d.energy+'Wh');
 
     gauge('gV',  (+d.voltage - 195) / 55);
-    gauge('gW',  +d.power / 2300);
+    gauge('gW',  +d.power / 3000);
     gauge('gPF', +d.power_factor);
     setText('gVv',  d.voltage);
     setText('gWv',  d.power);
