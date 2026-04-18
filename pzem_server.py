@@ -272,7 +272,38 @@ def api_cost():
     return jsonify(analytics.cost_analysis(price_kwh=price))
 
 
-@app.route('/api/analytics/trigger_daily_update')
+@app.route('/api/reset_energy', methods=['POST'])
+def api_reset_energy():
+    """
+    Azzera il contatore energia del PZEM-004t via Modbus.
+    Chiamata POST per evitare reset accidentali da browser.
+    Dopo il reset svuota anche il TSV (mantiene solo l'header)
+    e rigenera il JSON giornaliero.
+    """
+    ok = reader.reset_energy()
+    if ok:
+        # Svuota il TSV mantenendo l'header
+        with _write_buf_lock:
+            _write_buf.clear()
+        try:
+            header_line = ''
+            with open(TSV_FILE, 'r') as f:
+                header_line = f.readline()
+            with open(TSV_FILE, 'w') as f:
+                f.write(header_line)
+            analytics.invalidate_cache()
+            # Rigenera JSON giornaliero (sarà vuoto, giusto)
+            import os as _os
+            if _os.path.exists(analytics.DAILY_JSON):
+                _os.remove(analytics.DAILY_JSON)
+        except Exception as e:
+            log.warning(f"Errore pulizia TSV dopo reset: {e}")
+        return jsonify({'ok': True, 'message': 'Contatore azzerato e storico svuotato.'})
+    else:
+        return jsonify({'ok': False, 'message': 'Reset fallito. Verificare connessione sensore.'}), 500
+
+
+
 def api_trigger_daily():
     """Endpoint di debug per forzare l'aggiornamento dell'aggregato."""
     try:
