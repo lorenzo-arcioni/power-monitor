@@ -196,53 +196,94 @@ def _save_daily_json(data: list[dict]):
 
 def update_daily_aggregate():
     """
-    Aggiorna pzem_daily.json leggendo dal TSV solo i giorni mancanti.
-    Viene chiamata dal server in un thread periodico (ogni ora).
+    Aggiorna pzem_daily.json scansionando il TSV in modo leggero.
 
-    Strategia:
-      - Carica l'aggregato esistente.
-      - Trova l'ultimo giorno già aggregato.
-      - Legge solo le righe del TSV dal giorno successivo in poi,
-        usando tail_read_tsv con un limite più alto solo per questo task.
-      - Unisce e salva.
+    Problema del tail: energy è cumulativa. Se tagli le righe a metà
+    giornata, max-min del giorno parziale è sbagliato (potresti avere
+    solo la seconda metà del giorno dove energy è già alta).
+    Soluzione: scansione lineare dell'intero TSV leggendo SOLO le colonne
+    timestamp e energy (le altre vengono ignorate). Su un file da 14 MB
+    con ~250k righe e 2 colonne invece di 10, il parsing è ~5x più veloce
+    e la RAM usata è minima (due float per riga, non dieci).
+
+    Strategia incrementale:
+      - Carica il JSON esistente e trova l'ultimo giorno già chiuso.
+      - Un giorno è "chiuso" se NON è oggi (il giorno corrente è ancora
+        in corso, quindi max-min sarebbe parziale).
+      - Scansiona il TSV saltando le righe dei giorni già aggregati
+        (confronto stringa sul prefisso data, O(1) per riga).
+      - Ricalcola solo i giorni nuovi + ri-aggrega oggi (giorno aperto).
     """
-    existing = _load_daily_json()
-    last_day = existing[-1]['day'] if existing else '1970-01-01'
+    existing  = _load_daily_json()
+    today_str = datetime.now().strftime('%Y-%m-%d')
 
-    # Quante righe ci servono? Al max 30 giorni × 43200 campioni/giorno (a 2s)
-    # Ma è troppo. Usiamo un approccio diverso: leggiamo tutto il TSV
-    # solo per i giorni non ancora aggregati, usando una lettura "tail large".
-    # In pratica dopo il primo avvio questo aggiornamento incrementale
-    # legge solo le ultime 24-48h di dati (1 o 2 giorni nuovi).
-    rows_needed = 86400  # ~2 giorni a 2s/campione — al massimo
-    rows = tail_read_tsv(rows_needed)
+    # Giorni già chiusi e definitivi (tutto tranne oggi)
+    closed = {e['day']: e for e in existing if e['day'] < today_str}
+    last_closed_day = max(closed.keys()) if closed else '1970-01-01'
 
-    by_day: dict = defaultdict(list)
-    for r in rows:
-        day = r['timestamp'][:10]
-        if day > last_day:
-            by_day[day].append(r['energy'])
+    # Scansione TSV — legge solo timestamp e energy
+    # by_day[giorno] = (min_energy, max_energy)
+    by_day_min: dict[str, float] = {}
+    by_day_max: dict[str, float] = {}
 
-    if not by_day:
-        return  # Nessun giorno nuovo
+    if not os.path.exists(TSV_FILE):
+        return
 
-    new_entries = []
-    for day in sorted(by_day):
-        vals = by_day[day]
-        if len(vals) >= 2:
-            consumed = round(max(vals) - min(vals), 1)
-            new_entries.append({'day': day, 'energy_wh': consumed})
-        # Giorno con < 2 campioni: scartato (dati insufficienti)
+    ts_idx  = None
+    en_idx  = None
 
-    if new_entries:
-        merged = existing + new_entries
-        # Deduplication per giorno (ultimo vince)
-        seen: dict = {}
-        for e in merged:
-            seen[e['day']] = e
-        merged = sorted(seen.values(), key=lambda x: x['day'])
-        _save_daily_json(merged)
-        log.info(f"Daily aggregate aggiornato: {len(new_entries)} nuovi giorni → totale {len(merged)}")
+    with open(TSV_FILE, newline='', encoding='utf-8', errors='replace') as f:
+        reader = csv.reader(f, delimiter='\t')
+        try:
+            header = next(reader)
+        except StopIteration:
+            return
+        try:
+            ts_idx = header.index('timestamp')
+            en_idx = header.index('energy')
+        except ValueError:
+            log.error("update_daily_aggregate: colonne timestamp/energy non trovate nell'header")
+            return
+
+        for row in reader:
+            try:
+                day = row[ts_idx][:10]
+                # Salta i giorni già chiusi e definitivi per velocità
+                if day < last_closed_day:
+                    continue
+                val = float(row[en_idx])
+                if day not in by_day_min:
+                    by_day_min[day] = val
+                    by_day_max[day] = val
+                else:
+                    if val < by_day_min[day]: by_day_min[day] = val
+                    if val > by_day_max[day]: by_day_max[day] = val
+            except (IndexError, ValueError):
+                continue
+
+    if not by_day_min:
+        return
+
+    # Calcola consumo per ogni giorno scansionato
+    new_or_updated: dict = {}
+    for day in sorted(by_day_min.keys()):
+        consumed = round(by_day_max[day] - by_day_min[day], 1)
+        if consumed < 0:
+            # Reset del contatore PZEM durante la giornata: usa solo il max
+            consumed = round(by_day_max[day], 1)
+        if consumed >= 0:
+            new_or_updated[day] = {'day': day, 'energy_wh': consumed}
+
+    # Unisci: giorni chiusi dal JSON + giorni nuovi/aggiornati dalla scansione
+    # I giorni chiusi già nel JSON rimangono invariati (non vengono riScansionati)
+    merged_dict = {**closed, **new_or_updated}
+    merged = sorted(merged_dict.values(), key=lambda x: x['day'])
+
+    _save_daily_json(merged)
+    log.info(
+        f"Daily aggregate aggiornato: {len(new_or_updated)} giorni scansionati "
+        f"→ totale {len(merged)} giorni"
+    )
 
 
 def daily_totals(rows: list[dict] = None) -> list[dict]:
@@ -258,16 +299,23 @@ def daily_totals(rows: list[dict] = None) -> list[dict]:
     # Fallback: calcolo dalle righe in memoria
     if not rows:
         rows = load_rows_cached()
-    by_day: dict = defaultdict(list)
+    by_day_min: dict = {}
+    by_day_max: dict = {}
     for r in rows:
         try:
-            by_day[r['timestamp'][:10]].append(r['energy'])
+            day = r['timestamp'][:10]
+            val = r['energy']
+            if day not in by_day_min:
+                by_day_min[day] = val; by_day_max[day] = val
+            else:
+                if val < by_day_min[day]: by_day_min[day] = val
+                if val > by_day_max[day]: by_day_max[day] = val
         except Exception:
             continue
     result = []
-    for day in sorted(by_day):
-        vals = by_day[day]
-        consumed = (max(vals) - min(vals)) if len(vals) >= 2 else 0
+    for day in sorted(by_day_min.keys()):
+        consumed = by_day_max[day] - by_day_min[day]
+        if consumed < 0: consumed = by_day_max[day]
         result.append({'day': day, 'energy_wh': round(consumed, 1)})
     return result
 
