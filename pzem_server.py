@@ -104,18 +104,16 @@ def poll_loop():
 def daily_update_loop():
     """
     Aggiorna pzem_daily.json ogni DAILY_UPDATE_SECS secondi.
-    Gira in background senza toccare Flask.
-    Il primo aggiornamento avviene subito all'avvio (dopo 5s di attesa
-    per dare tempo al server di partire).
+    Il primo aggiornamento è già fatto in modo sincrono in __main__
+    prima che Flask parta, quindi qui aspettiamo subito DAILY_UPDATE_SECS.
     """
-    time.sleep(5)
     while True:
+        time.sleep(DAILY_UPDATE_SECS)
         try:
             log.info("Aggiornamento aggregato giornaliero…")
             analytics.update_daily_aggregate()
         except Exception as e:
             log.error(f"Errore daily_update_loop: {e}")
-        time.sleep(DAILY_UPDATE_SECS)
 
 
 # ── Flask ─────────────────────────────────────────────────────────────────────
@@ -268,11 +266,21 @@ def api_trigger_daily():
 if __name__ == '__main__':
     init_tsv()
 
+    # Aggiorna l'aggregato giornaliero in modo SINCRONO prima di avviare Flask.
+    # Così quando arriva la prima richiesta HTTP il JSON esiste già.
+    # Su un TSV da 14 MB con Centrino Duo ci vogliono 5-15 secondi.
+    log.info("Aggiornamento iniziale aggregato giornaliero (attendere)…")
+    try:
+        analytics.update_daily_aggregate()
+        log.info("Aggregato giornaliero pronto.")
+    except Exception as e:
+        log.error(f"Errore aggiornamento iniziale: {e}")
+
     # Thread polling sensore
     t_poll = threading.Thread(target=poll_loop, daemon=True)
     t_poll.start()
 
-    # Thread aggiornamento aggregato giornaliero
+    # Thread aggiornamento periodico (ogni ora, non subito)
     t_daily = threading.Thread(target=daily_update_loop, daemon=True)
     t_daily.start()
 

@@ -116,8 +116,8 @@ def tail_read_tsv(n_rows: int = STATS_ROWS) -> list[dict]:
 
     rows: list[dict] = []
     try:
-        reader = csv.DictReader(io.StringIO(fragment.decode('utf-8', errors='replace')),
-                                delimiter='\t')
+        text = fragment.decode('utf-8', errors='replace').replace('\r', '')
+        reader = csv.DictReader(io.StringIO(text), delimiter='\t')
         for row in reader:
             try:
                 parsed = {'timestamp': row['timestamp']}
@@ -233,7 +233,7 @@ def update_daily_aggregate():
     en_idx  = None
 
     with open(TSV_FILE, newline='', encoding='utf-8', errors='replace') as f:
-        reader = csv.reader(f, delimiter='\t')
+        reader = csv.reader((line.replace('\r', '') for line in f), delimiter='\t')
         try:
             header = next(reader)
         except StopIteration:
