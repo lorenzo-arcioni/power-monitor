@@ -8,242 +8,145 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* ══════════════════════════════════════════════
-   DESIGN SYSTEM — scala di grigi desaturata
-══════════════════════════════════════════════ */
 :root{
-  --bg:        #0a0a0b;
-  --surface:   #111113;
-  --surface2:  #18181b;
-  --surface3:  #1e1e22;
-  --border:    #2a2a2e;
-  --border2:   #363639;
-
-  /* Grigi testo */
-  --t1: #ffffff;
-  --t2: #d8d8e8;
-  --t3: #9898a8;
-  --t4: #606070;
-
-  /* Accenti desaturati */
-  --blue:   #5aa8f0;
-  --violet: #b090e8;
-  --amber:  #e0b840;
-  --sage:   #48c880;
-  --slate:  #60a0c8;
-  --rose:   #e06888;
-  --sand:   #c8a060;
-  --mauve:  #a878d8;
-
-  /* Semantici */
-  --ok:     #4a7a5a;
-  --warn:   #8a7040;
-  --err:    #8a4040;
-  --offline:#3a3a40;
-
-  --radius: 10px;
-  --mono: 'Courier Prime', 'Courier New', monospace;
-  --serif: 'EB Garamond', Georgia, serif;
+  --bg:#0a0a0b;--surface:#111113;--surface2:#18181b;--surface3:#1e1e22;
+  --border:#2a2a2e;--border2:#363639;
+  --t1:#ffffff;--t2:#d8d8e8;--t3:#9898a8;--t4:#606070;
+  --blue:#5aa8f0;--violet:#b090e8;--amber:#e0b840;--sage:#48c880;
+  --slate:#60a0c8;--rose:#e06888;--sand:#c8a060;--mauve:#a878d8;
+  --ok:#4a7a5a;--warn:#8a7040;--err:#8a4040;--offline:#3a3a40;
+  --radius:10px;--mono:'Courier Prime','Courier New',monospace;
+  --serif:'EB Garamond',Georgia,serif;
 }
-
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
-body{
-  background:var(--bg);color:var(--t2);
-  font-family:var(--serif);font-size:15px;
-  overflow-x:hidden;min-height:100vh;
-}
+body{background:var(--bg);color:var(--t2);font-family:var(--serif);font-size:15px;overflow-x:hidden;min-height:100vh}
 canvas{touch-action:pan-y}
-a{color:var(--blue);text-decoration:none}
 
-/* ── NOISE ── */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
-}
+/* NOISE */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E")}
 
-/* ══════════════════════════════════════════════
-   LAYOUT
-══════════════════════════════════════════════ */
 .shell{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
 
-/* ── HEADER ── */
-header{
-  position:sticky;top:0;z-index:200;
-  background:rgba(10,10,11,.92);backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
-  padding:.9rem 1.6rem;
-  display:flex;align-items:center;gap:1rem;
-}
+/* HEADER */
+header{position:sticky;top:0;z-index:200;background:rgba(10,10,11,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);padding:.9rem 1.6rem;display:flex;align-items:center;gap:1rem}
 .logo{display:flex;align-items:center;gap:.75rem;flex-shrink:0}
-.logo-mark{
-  width:32px;height:32px;border-radius:7px;
-  border:1px solid var(--border2);background:var(--surface2);
-  display:flex;align-items:center;justify-content:center;
-}
+.logo-mark{width:32px;height:32px;border-radius:7px;border:1px solid var(--border2);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center}
 .logo-mark svg{width:16px;height:16px;stroke:var(--t2);fill:none;stroke-width:2}
 .logo-name{font-size:1rem;font-weight:700;color:var(--t1);letter-spacing:.01em}
 .logo-sub{font-size:.6rem;font-family:var(--mono);color:var(--t3);letter-spacing:.1em;text-transform:uppercase}
-
 .header-center{flex:1;display:flex;align-items:center;justify-content:center}
-.sensor-status{
-  display:flex;align-items:center;gap:.5rem;
-  padding:.3rem .9rem;border-radius:999px;
-  border:1px solid var(--border);background:var(--surface2);
-  font-family:var(--mono);font-size:.7rem;color:var(--t3);
-  transition:all .5s;
-}
+.sensor-status{display:flex;align-items:center;gap:.5rem;padding:.3rem .9rem;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface2);font-family:var(--mono);font-size:.7rem;
+  color:var(--t3);transition:all .5s}
 .sensor-status.ok{border-color:var(--ok);color:var(--ok)}
 .sensor-status.err{border-color:var(--err);color:#b06060;background:rgba(138,64,64,.08)}
 .s-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
 .s-dot.pulse{animation:sdot 2s ease infinite}
 @keyframes sdot{0%,100%{opacity:1}50%{opacity:.3}}
-
 .header-right{display:flex;align-items:center;gap:.75rem;flex-shrink:0}
-.hbtn{
-  padding:.3rem .75rem;border-radius:6px;border:1px solid var(--border);
-  background:transparent;color:var(--t3);font-family:var(--mono);font-size:.65rem;
-  cursor:pointer;transition:.15s;letter-spacing:.05em;
-}
+.hbtn{padding:.3rem .75rem;border-radius:6px;border:1px solid var(--border);background:transparent;
+  color:var(--t3);font-family:var(--mono);font-size:.65rem;cursor:pointer;transition:.15s;letter-spacing:.05em}
 .hbtn:hover{border-color:var(--border2);color:var(--t2);background:var(--surface2)}
 .ts{font-family:var(--mono);font-size:.65rem;color:var(--t4)}
 
-/* ── OFFLINE BANNER ── */
-.offline-banner{
-  display:none;
-  background:rgba(138,64,64,.12);border-bottom:1px solid var(--err);
-  padding:.75rem 1.6rem;
-  align-items:center;gap:.75rem;
-}
+/* OFFLINE BANNER */
+.offline-banner{display:none;background:rgba(138,64,64,.12);border-bottom:1px solid var(--err);
+  padding:.75rem 1.6rem;align-items:center;gap:.75rem}
 .offline-banner.show{display:flex}
 .offline-icon{width:18px;height:18px;stroke:#b06060;fill:none;stroke-width:2;flex-shrink:0}
 .offline-msg{font-size:.85rem;color:#b06060}
 .offline-msg strong{font-weight:700}
 .offline-meta{font-family:var(--mono);font-size:.65rem;color:var(--t3);margin-left:auto}
 
-/* ── MAIN ── */
+/* MAIN */
 main{flex:1;padding:1.4rem 1.6rem;display:flex;flex-direction:column;gap:1.4rem}
 
-/* ── SECTION HEADER ── */
+/* SECTION HEADER */
 .sec-head{display:flex;align-items:baseline;gap:.75rem;margin-bottom:.75rem}
-.sec-title{font-size:.65rem;font-family:var(--mono);color:var(--t3);
-  letter-spacing:.15em;text-transform:uppercase}
+.sec-title{font-size:.65rem;font-family:var(--mono);color:var(--t3);letter-spacing:.15em;text-transform:uppercase}
 .sec-line{flex:1;height:1px;background:var(--border)}
 .sec-badge{font-family:var(--mono);font-size:.6rem;color:var(--t4)}
 
-/* ── KPI GRID ── */
+/* KPI GRID */
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
-.kpi{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:1rem 1.1rem;
-  cursor:pointer;position:relative;overflow:hidden;
-  transition:border-color .2s,background .2s;
-}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem 1.1rem;cursor:pointer;position:relative;overflow:hidden;transition:border-color .2s,background .2s}
 .kpi:hover{border-color:var(--border2);background:var(--surface2)}
-.kpi::after{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:var(--kc,var(--blue));opacity:.5;
-}
-.kpi-lbl{font-size:.6rem;font-family:var(--mono);color:var(--t3);
-  letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
-.kpi-val{font-size:1.8rem;font-weight:700;color:var(--kc,var(--t1));
-  line-height:1;font-family:var(--serif)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--kc,var(--blue));opacity:.5}
+.kpi-lbl{font-size:.6rem;font-family:var(--mono);color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
+.kpi-val{font-size:1.8rem;font-weight:700;color:var(--kc,var(--t1));line-height:1;font-family:var(--serif)}
 .kpi-unit{font-size:.7rem;font-family:var(--mono);color:var(--t3);margin-left:.2rem}
 .kpi-sub{font-size:.65rem;font-family:var(--mono);color:var(--t4);margin-top:.35rem}
-.kpi-info{position:absolute;top:.6rem;right:.6rem;
-  width:14px;height:14px;border-radius:50%;border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
+.kpi-info{position:absolute;top:.6rem;right:.6rem;width:14px;height:14px;border-radius:50%;
+  border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;
   font-size:.55rem;color:var(--t4);font-family:var(--mono);font-style:normal}
+.kc-v{--kc:var(--blue)}.kc-a{--kc:var(--violet)}.kc-w{--kc:var(--amber)}
+.kc-ap{--kc:var(--sand)}.kc-rp{--kc:var(--mauve)}.kc-e{--kc:var(--sage)}
+.kc-hz{--kc:var(--slate)}.kc-pf{--kc:var(--rose)}
 
-/* KPI colori */
-.kc-v   {--kc:var(--blue)}
-.kc-a   {--kc:var(--violet)}
-.kc-w   {--kc:var(--amber)}
-.kc-ap  {--kc:var(--sand)}
-.kc-rp  {--kc:var(--mauve)}
-.kc-e   {--kc:var(--sage)}
-.kc-hz  {--kc:var(--slate)}
-.kc-pf  {--kc:var(--rose)}
-
-/* ── GAUGE ROW ── */
+/* GAUGE ROW */
 .gauge-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
-.g-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:1rem;
-  display:flex;flex-direction:column;align-items:center;gap:.5rem;
-}
-.g-label{font-size:.6rem;font-family:var(--mono);color:var(--t3);
-  letter-spacing:.12em;text-transform:uppercase}
+.g-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.g-label{font-size:.6rem;font-family:var(--mono);color:var(--t3);letter-spacing:.12em;text-transform:uppercase}
 .g-wrap{position:relative;width:100%;max-width:140px;height:80px}
 .g-wrap svg{display:block;width:100%;height:auto;overflow:visible}
-.g-val{
-  position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);
-  font-size:1.15rem;font-weight:700;white-space:nowrap;color:var(--gc,var(--t1));
-  font-family:var(--serif);
-}
+.g-val{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);
+  font-size:1.15rem;font-weight:700;white-space:nowrap;color:var(--gc,var(--t1));font-family:var(--serif)}
 .g-val small{font-size:.6rem;font-family:var(--mono);color:var(--t3)}
 .g-range{font-size:.55rem;font-family:var(--mono);color:var(--t4)}
 
-/* ── CHART CARD ── */
-.chart-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:1rem 1.1rem;
-}
+/* CHART CARD */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.1rem}
 .chart-card.full{grid-column:1/-1}
 .ch-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
-.ch-title{font-size:.65rem;font-family:var(--mono);color:var(--t3);
-  letter-spacing:.1em;text-transform:uppercase}
-.ch-badge{font-size:.6rem;font-family:var(--mono);color:var(--t4);
-  padding:.15rem .5rem;border-radius:4px;background:var(--surface2);border:1px solid var(--border)}
+.ch-title{font-size:.65rem;font-family:var(--mono);color:var(--t3);letter-spacing:.1em;text-transform:uppercase}
+.ch-badge{font-size:.6rem;font-family:var(--mono);color:var(--t4);padding:.15rem .5rem;
+  border-radius:4px;background:var(--surface2);border:1px solid var(--border)}
 .ch-wrap{position:relative;height:180px}
 .ch-wrap.md{height:220px}
 .ch-wrap.lg{height:260px}
 
-/* ── GRIDS ── */
+/* LAZY PLACEHOLDER */
+.chart-skeleton{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:var(--t4);font-family:var(--mono);font-size:.65rem;letter-spacing:.1em}
+
+/* GRIDS */
 .g2{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
 
-/* ── STAT TABLE ── */
+/* STAT TABLE */
 .stat-table{width:100%;border-collapse:collapse;font-size:.8rem}
-.stat-table th{
-  font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--t3);text-align:left;padding:.4rem .6rem;
-  border-bottom:1px solid var(--border);font-weight:400;
-}
-.stat-table td{
-  padding:.45rem .6rem;border-bottom:1px solid var(--border);
-  color:var(--t2);vertical-align:middle;
-}
+.stat-table th{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--t3);text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--border);font-weight:400}
+.stat-table td{padding:.45rem .6rem;border-bottom:1px solid var(--border);color:var(--t2);vertical-align:middle}
 .stat-table tr:last-child td{border-bottom:none}
 .stat-table tr:hover td{background:var(--surface2)}
 .stat-num{font-family:var(--mono);font-size:.75rem;color:var(--t1)}
 .stat-field{font-family:var(--mono);font-size:.7rem;color:var(--t3)}
 
-/* ── ANOMALY LIST ── */
+/* ANOMALY LIST */
 .anomaly-list{display:flex;flex-direction:column;gap:.4rem;max-height:220px;overflow-y:auto}
-.anomaly-item{
-  display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;
-  background:var(--surface2);border:1px solid var(--border);border-radius:7px;
-  font-size:.75rem;
-}
+.anomaly-item{display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;
+  background:var(--surface2);border:1px solid var(--border);border-radius:7px;font-size:.75rem}
 .anomaly-item.high{border-color:var(--err)}
 .a-ts{font-family:var(--mono);font-size:.6rem;color:var(--t4);white-space:nowrap}
 .a-field{font-family:var(--mono);font-size:.65rem;color:var(--rose);text-transform:uppercase}
 .a-val{font-family:var(--mono);color:var(--t1);margin-left:auto}
 .a-z{font-family:var(--mono);font-size:.6rem;color:var(--t3)}
 
-/* ── COST CARDS ── */
+/* COST CARDS */
 .cost-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
-.cost-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:1rem;text-align:center;
-}
-.cost-period{font-size:.6rem;font-family:var(--mono);color:var(--t3);
-  letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
+.cost-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center}
+.cost-period{font-size:.6rem;font-family:var(--mono);color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
 .cost-kwh{font-size:1.4rem;font-weight:700;color:var(--t1);line-height:1}
 .cost-eur{font-size:.8rem;font-family:var(--mono);color:var(--sage);margin-top:.2rem}
 
-/* ── FORECAST TABLE ── */
+/* FORECAST TABLE */
 .fc-row{display:flex;align-items:center;gap:.6rem;padding:.4rem .5rem;border-bottom:1px solid var(--border);font-size:.78rem}
 .fc-row:last-child{border-bottom:none}
 .fc-day{font-family:var(--mono);font-size:.65rem;color:var(--t3);width:90px;flex-shrink:0}
@@ -252,79 +155,52 @@ main{flex:1;padding:1.4rem 1.6rem;display:flex;flex-direction:column;gap:1.4rem}
 .fc-val{font-family:var(--mono);font-size:.65rem;color:var(--t1);width:70px;text-align:right;flex-shrink:0}
 .fc-range{font-family:var(--mono);font-size:.55rem;color:var(--t4)}
 
-/* ── TABS ── */
+/* TABS */
 .tabs{display:flex;gap:.4rem;flex-wrap:wrap}
-.tab{
-  padding:.3rem .7rem;border:1px solid var(--border);border-radius:5px;
-  background:transparent;color:var(--t3);font-family:var(--mono);font-size:.65rem;
-  cursor:pointer;transition:.15s;white-space:nowrap;
-}
+.tab{padding:.3rem .7rem;border:1px solid var(--border);border-radius:5px;background:transparent;
+  color:var(--t3);font-family:var(--mono);font-size:.65rem;cursor:pointer;transition:.15s;white-space:nowrap}
 .tab.on{border-color:var(--blue);color:var(--blue);background:rgba(107,140,186,.08)}
 
-/* ── INFO POPUP ── */
-.overlay{
-  display:none;position:fixed;inset:0;z-index:500;
-  background:rgba(5,5,6,.8);backdrop-filter:blur(8px);
-  align-items:center;justify-content:center;padding:1.5rem;
-}
+/* POPUP */
+.overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(5,5,6,.8);
+  backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:1.5rem}
 .overlay.open{display:flex;animation:fadein .18s ease}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
-.popup{
-  background:var(--surface2);border:1px solid var(--border2);
-  border-radius:14px;max-width:400px;width:100%;padding:1.6rem;
-  position:relative;box-shadow:0 24px 80px rgba(0,0,0,.7);
-  animation:slideup .2s ease;
-}
+.popup{background:var(--surface2);border:1px solid var(--border2);border-radius:14px;
+  max-width:400px;width:100%;padding:1.6rem;position:relative;
+  box-shadow:0 24px 80px rgba(0,0,0,.7);animation:slideup .2s ease}
 @keyframes slideup{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
-.popup-bar{position:absolute;top:0;left:1.6rem;right:1.6rem;height:1px;
-  background:var(--pc,var(--blue));border-radius:99px}
-.popup-close{
-  position:absolute;top:.9rem;right:.9rem;
-  width:26px;height:26px;border-radius:50%;
-  border:1px solid var(--border);background:var(--surface3);
-  color:var(--t3);font-size:.85rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:.15s;
-}
+.popup-bar{position:absolute;top:0;left:1.6rem;right:1.6rem;height:1px;background:var(--pc,var(--blue));border-radius:99px}
+.popup-close{position:absolute;top:.9rem;right:.9rem;width:26px;height:26px;border-radius:50%;
+  border:1px solid var(--border);background:var(--surface3);color:var(--t3);font-size:.85rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
 .popup-close:hover{background:var(--border);color:var(--t1)}
-.popup-sup{font-size:.58rem;font-family:var(--mono);letter-spacing:.15em;
-  text-transform:uppercase;color:var(--pc,var(--blue));margin-bottom:.4rem}
+.popup-sup{font-size:.58rem;font-family:var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--pc,var(--blue));margin-bottom:.4rem}
 .popup-title{font-size:1.35rem;font-weight:700;color:var(--t1);margin-bottom:.8rem}
 .popup-body{font-size:.95rem;line-height:1.7;color:var(--t2)}
 .popup-body strong{color:var(--t1);font-weight:600}
-.popup-unit{
-  display:inline-block;margin-top:.9rem;padding:.2rem .6rem;
-  border-radius:5px;background:var(--surface);border:1px solid var(--border);
-  font-family:var(--mono);font-size:.65rem;color:var(--pc,var(--blue));
-}
+.popup-unit{display:inline-block;margin-top:.9rem;padding:.2rem .6rem;border-radius:5px;
+  background:var(--surface);border:1px solid var(--border);font-family:var(--mono);
+  font-size:.65rem;color:var(--pc,var(--blue))}
 
-/* ── FOOTER ── */
-footer{
-  border-top:1px solid var(--border);padding:.75rem 1.6rem;
-  font-family:var(--mono);font-size:.6rem;color:var(--t4);
-  display:flex;justify-content:space-between;align-items:center;gap:1rem;
-  flex-wrap:wrap;
-}
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:.75rem 1.6rem;font-family:var(--mono);
+  font-size:.6rem;color:var(--t4);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
 
-/* ── SCROLLBAR ── */
+/* SCROLLBAR */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
 
-/* ── EMPTY STATE ── */
-.empty{
-  padding:2rem;text-align:center;color:var(--t4);
-  font-family:var(--mono);font-size:.75rem;
-}
+/* EMPTY */
+.empty{padding:2rem;text-align:center;color:var(--t4);font-family:var(--mono);font-size:.75rem}
 
-/* ══════════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════════ */
+/* RESPONSIVE */
 @media(max-width:900px){
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .g3{grid-template-columns:repeat(2,1fr)}
   .cost-grid{grid-template-columns:repeat(2,1fr)}
 }
-
 @media(max-width:600px){
   header{padding:.75rem 1rem;flex-wrap:wrap;gap:.5rem}
   .header-center{order:3;width:100%}
@@ -355,7 +231,7 @@ footer{
 <body>
 <div class="shell">
 
-<!-- ═══ HEADER ═══ -->
+<!-- HEADER -->
 <header>
   <div class="logo">
     <div class="logo-mark">
@@ -366,39 +242,36 @@ footer{
       <div class="logo-sub">PZEM-004t · Modbus RTU</div>
     </div>
   </div>
-
   <div class="header-center">
     <div class="sensor-status err" id="sensorStatus">
       <span class="s-dot" id="sDot"></span>
       <span id="sText">Connessione in corso…</span>
     </div>
   </div>
-
   <div class="header-right">
     <span class="ts" id="tsLabel">–</span>
     <button class="hbtn" onclick="downloadTSV()">↓ TSV</button>
   </div>
 </header>
 
-<!-- ═══ OFFLINE BANNER ═══ -->
+<!-- OFFLINE BANNER -->
 <div class="offline-banner" id="offlineBanner">
   <svg class="offline-icon" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10"/>
-    <line x1="12" y1="8" x2="12" y2="12"/>
+    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
     <line x1="12" y1="16" x2="12.01" y2="16"/>
   </svg>
   <div class="offline-msg">
     <strong>Sensore non disponibile.</strong>
     Impossibile leggere i dati dal PZEM-004t su <span id="portLabel">/dev/ttyUSB0</span>.
-    Verificare il collegamento fisico e che il processo abbia i permessi sulla porta seriale.
+    Verificare il collegamento fisico e i permessi sulla porta seriale.
   </div>
   <div class="offline-meta" id="offlineMeta">–</div>
 </div>
 
-<!-- ═══ MAIN ═══ -->
+<!-- MAIN -->
 <main id="mainContent">
 
-  <!-- ── KPI ── -->
+  <!-- KPI -->
   <section>
     <div class="sec-head">
       <span class="sec-title">Misure in tempo reale</span>
@@ -406,58 +279,42 @@ footer{
       <span class="sec-badge" id="kpiBadge">–</span>
     </div>
     <div class="kpi-grid">
-      <div class="kpi kc-v"  onclick="showInfo('voltage')">
-        <i class="kpi-info">i</i>
+      <div class="kpi kc-v"  onclick="showInfo('voltage')"><i class="kpi-info">i</i>
         <div class="kpi-lbl">Tensione</div>
         <div><span class="kpi-val" id="kV">–</span><span class="kpi-unit">V</span></div>
-        <div class="kpi-sub" id="kVd">–</div>
-      </div>
-      <div class="kpi kc-a"  onclick="showInfo('current')">
-        <i class="kpi-info">i</i>
+        <div class="kpi-sub" id="kVd">–</div></div>
+      <div class="kpi kc-a"  onclick="showInfo('current')"><i class="kpi-info">i</i>
         <div class="kpi-lbl">Corrente</div>
         <div><span class="kpi-val" id="kA">–</span><span class="kpi-unit">A</span></div>
-        <div class="kpi-sub" id="kAd">–</div>
-      </div>
-      <div class="kpi kc-w"  onclick="showInfo('power')">
-        <i class="kpi-info">i</i>
+        <div class="kpi-sub" id="kAd">–</div></div>
+      <div class="kpi kc-w"  onclick="showInfo('power')"><i class="kpi-info">i</i>
         <div class="kpi-lbl">Potenza Attiva</div>
         <div><span class="kpi-val" id="kW">–</span><span class="kpi-unit">W</span></div>
-        <div class="kpi-sub" id="kWd">–</div>
-      </div>
-      <div class="kpi kc-e"  onclick="showInfo('energy')">
-        <i class="kpi-info">i</i>
+        <div class="kpi-sub" id="kWd">–</div></div>
+      <div class="kpi kc-e"  onclick="showInfo('energy')"><i class="kpi-info">i</i>
         <div class="kpi-lbl">Energia</div>
         <div><span class="kpi-val" id="kE">–</span><span class="kpi-unit">Wh</span></div>
-        <div class="kpi-sub">Totale accumulata</div>
-      </div>
-      <div class="kpi kc-ap" onclick="showInfo('apparent')">
-        <i class="kpi-info">i</i>
+        <div class="kpi-sub">Totale accumulata</div></div>
+      <div class="kpi kc-ap" onclick="showInfo('apparent')"><i class="kpi-info">i</i>
         <div class="kpi-lbl">Pot. Apparente</div>
         <div><span class="kpi-val" id="kAP">–</span><span class="kpi-unit">VA</span></div>
-        <div class="kpi-sub" id="kAPd">–</div>
-      </div>
-      <div class="kpi kc-rp" onclick="showInfo('reactive')">
-        <i class="kpi-info">i</i>
+        <div class="kpi-sub" id="kAPd">–</div></div>
+      <div class="kpi kc-rp" onclick="showInfo('reactive')"><i class="kpi-info">i</i>
         <div class="kpi-lbl">Pot. Reattiva</div>
         <div><span class="kpi-val" id="kRP">–</span><span class="kpi-unit">VAR</span></div>
-        <div class="kpi-sub">–</div>
-      </div>
-      <div class="kpi kc-hz" onclick="showInfo('frequency')">
-        <i class="kpi-info">i</i>
+        <div class="kpi-sub">–</div></div>
+      <div class="kpi kc-hz" onclick="showInfo('frequency')"><i class="kpi-info">i</i>
         <div class="kpi-lbl">Frequenza</div>
         <div><span class="kpi-val" id="kHz">–</span><span class="kpi-unit">Hz</span></div>
-        <div class="kpi-sub">Rete AC</div>
-      </div>
-      <div class="kpi kc-pf" onclick="showInfo('pf')">
-        <i class="kpi-info">i</i>
+        <div class="kpi-sub">Rete AC</div></div>
+      <div class="kpi kc-pf" onclick="showInfo('pf')"><i class="kpi-info">i</i>
         <div class="kpi-lbl">Fattore Potenza</div>
         <div><span class="kpi-val" id="kPF">–</span></div>
-        <div class="kpi-sub">cosφ</div>
-      </div>
+        <div class="kpi-sub">cosφ</div></div>
     </div>
   </section>
 
-  <!-- ── GAUGES ── -->
+  <!-- GAUGES -->
   <div class="gauge-row">
     <div class="g-card">
       <div class="g-label">Tensione</div>
@@ -494,7 +351,7 @@ footer{
     </div>
   </div>
 
-  <!-- ── LIVE CHARTS ── -->
+  <!-- LIVE CHARTS -->
   <section>
     <div class="sec-head">
       <span class="sec-title">Grafici live</span>
@@ -503,44 +360,29 @@ footer{
     </div>
     <div class="g2">
       <div class="chart-card">
-        <div class="ch-head">
-          <span class="ch-title">Tensione</span>
-          <span class="ch-badge" id="bV">–</span>
-        </div>
+        <div class="ch-head"><span class="ch-title">Tensione</span><span class="ch-badge" id="bV">–</span></div>
         <div class="ch-wrap"><canvas id="cVoltage"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="ch-head">
-          <span class="ch-title">Corrente</span>
-          <span class="ch-badge" id="bA">–</span>
-        </div>
+        <div class="ch-head"><span class="ch-title">Corrente</span><span class="ch-badge" id="bA">–</span></div>
         <div class="ch-wrap"><canvas id="cCurrent"></canvas></div>
       </div>
       <div class="chart-card full" style="grid-column:1/-1">
-        <div class="ch-head">
-          <span class="ch-title">Potenza Attiva &amp; Apparente</span>
-          <span class="ch-badge" id="bW">–</span>
-        </div>
+        <div class="ch-head"><span class="ch-title">Potenza Attiva &amp; Apparente</span><span class="ch-badge" id="bW">–</span></div>
         <div class="ch-wrap md"><canvas id="cPower"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="ch-head">
-          <span class="ch-title">Frequenza</span>
-          <span class="ch-badge" id="bHz">–</span>
-        </div>
+        <div class="ch-head"><span class="ch-title">Frequenza</span><span class="ch-badge" id="bHz">–</span></div>
         <div class="ch-wrap"><canvas id="cFreq"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="ch-head">
-          <span class="ch-title">Energia accumulata</span>
-          <span class="ch-badge" id="bE">–</span>
-        </div>
+        <div class="ch-head"><span class="ch-title">Energia accumulata</span><span class="ch-badge" id="bE">–</span></div>
         <div class="ch-wrap"><canvas id="cEnergy"></canvas></div>
       </div>
     </div>
   </section>
 
-  <!-- ── STORICO ── -->
+  <!-- STORICO -->
   <section>
     <div class="sec-head">
       <span class="sec-title">Storico</span>
@@ -563,7 +405,7 @@ footer{
     </div>
   </section>
 
-  <!-- ── STATISTICHE ── -->
+  <!-- STATISTICHE -->
   <section>
     <div class="sec-head">
       <span class="sec-title">Statistiche descrittive</span>
@@ -575,7 +417,7 @@ footer{
     </div>
   </section>
 
-  <!-- ── PROFILO ORARIO & PICCHI ── -->
+  <!-- PROFILO ORARIO -->
   <section>
     <div class="sec-head">
       <span class="sec-title">Profilo di carico</span>
@@ -583,21 +425,17 @@ footer{
     </div>
     <div class="g2">
       <div class="chart-card">
-        <div class="ch-head">
-          <span class="ch-title">Potenza media per ora del giorno</span>
-        </div>
+        <div class="ch-head"><span class="ch-title">Potenza media per ora del giorno</span></div>
         <div class="ch-wrap md"><canvas id="cPeak"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="ch-head">
-          <span class="ch-title">Consumo giornaliero (Wh)</span>
-        </div>
+        <div class="ch-head"><span class="ch-title">Consumo giornaliero (Wh)</span></div>
         <div class="ch-wrap md"><canvas id="cDaily"></canvas></div>
       </div>
     </div>
   </section>
 
-  <!-- ── PREVISIONE ── -->
+  <!-- PREVISIONE -->
   <section>
     <div class="sec-head">
       <span class="sec-title">Previsione consumi</span>
@@ -613,15 +451,13 @@ footer{
         <div class="ch-wrap md"><canvas id="cForecast"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="ch-head">
-          <span class="ch-title">Dettaglio previsione</span>
-        </div>
+        <div class="ch-head"><span class="ch-title">Dettaglio previsione</span></div>
         <div id="fcTable"><div class="empty">Dati insufficienti</div></div>
       </div>
     </div>
   </section>
 
-  <!-- ── COSTI ── -->
+  <!-- COSTI -->
   <section>
     <div class="sec-head">
       <span class="sec-title">Analisi costi</span>
@@ -635,14 +471,12 @@ footer{
       <div class="empty" style="grid-column:1/-1">Caricamento…</div>
     </div>
     <div class="chart-card" style="margin-top:.75rem">
-      <div class="ch-head">
-        <span class="ch-title">Consumo giornaliero ultimi 30gg</span>
-      </div>
+      <div class="ch-head"><span class="ch-title">Consumo giornaliero ultimi 30gg</span></div>
       <div class="ch-wrap md"><canvas id="cCostDaily"></canvas></div>
     </div>
   </section>
 
-  <!-- ── ANOMALIE ── -->
+  <!-- ANOMALIE -->
   <section>
     <div class="sec-head">
       <span class="sec-title">Anomalie rilevate</span>
@@ -657,12 +491,12 @@ footer{
 </main>
 
 <footer>
-  <span>PZEM-004t Power Monitor · v3.0</span>
+  <span>PZEM-004t Power Monitor · v3.1</span>
   <span id="ftStats">–</span>
   <span id="ftPort">–</span>
 </footer>
 
-<!-- ═══ INFO POPUP ═══ -->
+<!-- POPUP -->
 <div class="overlay" id="overlay" onclick="closePopup(event)">
   <div class="popup" id="popup">
     <div class="popup-bar" id="popupBar"></div>
@@ -674,16 +508,15 @@ footer{
   </div>
 </div>
 
-<!-- ═══ SCRIPT ═══ -->
 <script>
 // ═══════════════════════════════════════════════
 //  CONFIG
 // ═══════════════════════════════════════════════
-const API          = `http://${location.hostname}:5000/api`;
-const LIVE_WIN     = 120;
-const POLL_LIVE    = 2500;
-const POLL_HIST    = 30000;
-const POLL_ANALYTICS = 60000;
+const API           = `http://${location.hostname}:5000/api`;
+const LIVE_WIN      = 120;
+const POLL_LIVE     = 2500;
+const POLL_HIST     = 30000;
+const POLL_ANALYTICS= 60000;
 
 // ═══════════════════════════════════════════════
 //  CHART.JS DEFAULTS
@@ -695,21 +528,19 @@ Chart.defaults.font.size      = 10;
 Chart.defaults.plugins.legend.display = false;
 
 const makeTooltip = () => ({
-  backgroundColor: '#18181b',
-  borderColor:     '#2a2a2e',
-  borderWidth:     1,
-  padding:         10,
-  titleColor:      '#a8a8b0',
-  bodyColor:       '#f0f0f2',
-  titleFont:       {family:"'Courier Prime',monospace", size:10},
-  bodyFont:        {family:"'Courier Prime',monospace", size:11},
+  backgroundColor:'#18181b',borderColor:'#2a2a2e',borderWidth:1,padding:10,
+  titleColor:'#a8a8b0',bodyColor:'#f0f0f2',
+  titleFont:{family:"'Courier Prime',monospace",size:10},
+  bodyFont:{family:"'Courier Prime',monospace",size:11},
 });
 
 const lineOpts = (yMin, yMax) => ({
-  responsive:true, maintainAspectRatio:false,
-  animation:{duration:300},
+  responsive:true,maintainAspectRatio:false,
+  // FIX PERFORMANCE: disabilita animazione update, mantienila solo al primo render
+  animation:{duration:0},
+  transitions:{active:{animation:{duration:0}}},
   interaction:{mode:'index',intersect:false},
-  plugins:{tooltip: makeTooltip()},
+  plugins:{tooltip:makeTooltip()},
   scales:{
     x:{grid:{color:'#1e1e2250'},ticks:{maxTicksLimit:7,maxRotation:0}},
     y:{grid:{color:'#1e1e2250'},min:yMin,max:yMax,ticks:{maxTicksLimit:5}},
@@ -718,58 +549,74 @@ const lineOpts = (yMin, yMax) => ({
 
 const mkLine = (id, color, yMin, yMax) => new Chart(
   document.getElementById(id),
-  { type:'line', data:{labels:[],datasets:[{data:[],borderColor:color,borderWidth:1.5,
+  {type:'line',data:{labels:[],datasets:[{data:[],borderColor:color,borderWidth:1.5,
     pointRadius:0,tension:.4,fill:{target:'origin',above:color+'15'}}]},
-    options: lineOpts(yMin, yMax) }
+    options:lineOpts(yMin,yMax)}
 );
 
 const mkDual = (id, c1, c2) => new Chart(
   document.getElementById(id),
-  { type:'line', data:{labels:[],datasets:[
+  {type:'line',data:{labels:[],datasets:[
     {label:'Attiva',data:[],borderColor:c1,borderWidth:1.5,pointRadius:0,tension:.4,fill:{target:'origin',above:c1+'12'}},
     {label:'Apparente',data:[],borderColor:c2,borderWidth:1,pointRadius:0,tension:.4,borderDash:[4,4],fill:false},
-  ]}, options:{...lineOpts(),plugins:{...lineOpts().plugins,
-    legend:{display:true,position:'top',labels:{color:'#5a5a62',boxWidth:10,padding:12,
-    font:{family:"'Courier Prime',monospace",size:10}}}}} }
+  ]},options:{...lineOpts(),
+    animation:{duration:0},
+    transitions:{active:{animation:{duration:0}}},
+    plugins:{...lineOpts().plugins,
+      legend:{display:true,position:'top',labels:{color:'#5a5a62',boxWidth:10,padding:12,
+        font:{family:"'Courier Prime',monospace",size:10}}}}}}
 );
 
 const mkBar = (id, color) => new Chart(
   document.getElementById(id),
-  { type:'bar', data:{labels:[],datasets:[{data:[],backgroundColor:color+'60',
-    borderColor:color, borderWidth:1, borderRadius:3}]},
-    options:{responsive:true, maintainAspectRatio:false, animation:{duration:400},
-    plugins:{tooltip:makeTooltip()},
-    scales:{x:{grid:{color:'#1e1e2250'},ticks:{maxTicksLimit:12,maxRotation:45,font:{size:9}}},
-            y:{grid:{color:'#1e1e2250'},ticks:{maxTicksLimit:5}}}} }
+  {type:'bar',data:{labels:[],datasets:[{data:[],backgroundColor:color+'60',
+    borderColor:color,borderWidth:1,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      animation:{duration:0},
+      transitions:{active:{animation:{duration:0}}},
+      plugins:{tooltip:makeTooltip()},
+      scales:{
+        x:{grid:{color:'#1e1e2250'},ticks:{maxTicksLimit:12,maxRotation:45,font:{size:9}}},
+        y:{grid:{color:'#1e1e2250'},ticks:{maxTicksLimit:5}}}}}
 );
 
-const mkHistLine = () => new Chart(
-  document.getElementById('cHistory'),
-  { type:'line', data:{labels:[],datasets:[{data:[],borderColor:'#6b8cba',borderWidth:1.5,
-    pointRadius:0,tension:.3,fill:{target:'origin',above:'#6b8cba12'}}]},
-    options: lineOpts() }
+// FIX: dataset separati per storico e previsione, senza mischiare null nelle labels
+const mkForecast = () => new Chart(
+  document.getElementById('cForecast'),
+  {type:'line',data:{labels:[],datasets:[
+    {label:'Storico',data:[],borderColor:'#5a8870',borderWidth:1.5,pointRadius:2,tension:.3,
+     fill:false,spanGaps:false},
+    {label:'Previsione',data:[],borderColor:'#8b7aaa',borderWidth:1.5,pointRadius:3,tension:.3,
+     borderDash:[5,4],fill:{target:'origin',above:'#8b7aaa10'},spanGaps:false},
+  ]},options:{
+    responsive:true,maintainAspectRatio:false,
+    animation:{duration:300},
+    plugins:{
+      tooltip:makeTooltip(),
+      legend:{display:true,position:'top',labels:{color:'#5a5a62',boxWidth:10,padding:12,
+        font:{family:"'Courier Prime',monospace",size:10}}}
+    },
+    scales:{
+      x:{grid:{color:'#1e1e2250'},ticks:{maxTicksLimit:10,maxRotation:40,font:{size:9}}},
+      y:{grid:{color:'#1e1e2250'},ticks:{maxTicksLimit:5}}
+    }
+  }}
 );
 
-// ── Istanze ──────────────────────────────────────────────────────────────────
+// ── Istanze chart ──────────────────────────────────────────────────────────
 const CV  = mkLine('cVoltage',  '#6b8cba', 210, 240);
 const CA  = mkLine('cCurrent',  '#8b7aaa');
 const CP  = mkDual('cPower',    '#a89060', '#8a7860');
 const CF  = mkLine('cFreq',     '#607080', 49, 51);
 const CE  = mkLine('cEnergy',   '#5a8870');
-const CH  = mkHistLine();
-const CPeak = mkBar('cPeak',    '#a89060');
-const CDaily= mkBar('cDaily',   '#5a8870');
-const CForecast = (() => new Chart(document.getElementById('cForecast'),{
-  type:'line', data:{labels:[],datasets:[
-    {label:'Storico',data:[],borderColor:'#5a8870',borderWidth:1.5,pointRadius:2,tension:.3,fill:false},
-    {label:'Previsione',data:[],borderColor:'#8b7aaa',borderWidth:1.5,pointRadius:3,tension:.3,
-     borderDash:[5,4],fill:{target:'origin',above:'#8b7aaa10'}},
-  ]}, options:{responsive:true,maintainAspectRatio:false,animation:{duration:500},
-    plugins:{tooltip:makeTooltip(),legend:{display:true,position:'top',
-      labels:{color:'#5a5a62',boxWidth:10,padding:12,font:{family:"'Courier Prime',monospace",size:10}}}},
-    scales:{x:{grid:{color:'#1e1e2250'},ticks:{maxTicksLimit:10,maxRotation:40,font:{size:9}}},
-            y:{grid:{color:'#1e1e2250'},ticks:{maxTicksLimit:5}}}}
-}))();
+const CH  = new Chart(document.getElementById('cHistory'), {
+  type:'line',data:{labels:[],datasets:[{data:[],borderColor:'#6b8cba',borderWidth:1.5,
+    pointRadius:0,tension:.3,fill:{target:'origin',above:'#6b8cba12'}}]},
+  options:lineOpts()
+});
+const CPeak     = mkBar('cPeak',     '#a89060');
+const CDaily    = mkBar('cDaily',    '#5a8870');
+const CForecast = mkForecast();
 const CCostDaily= mkBar('cCostDaily','#607080');
 
 // ═══════════════════════════════════════════════
@@ -789,32 +636,24 @@ let sensorOnline = null;
 const setOnline = (online, port) => {
   if(online === sensorOnline) return;
   sensorOnline = online;
-
-  const st  = document.getElementById('sensorStatus');
+  const st = document.getElementById('sensorStatus');
   const dot = document.getElementById('sDot');
   const txt = document.getElementById('sText');
   const banner = document.getElementById('offlineBanner');
-
   if(online){
-    st.className  = 'sensor-status ok';
-    dot.className = 's-dot pulse';
-    txt.textContent = 'Sensore online';
-    banner.classList.remove('show');
+    st.className='sensor-status ok';dot.className='s-dot pulse';
+    txt.textContent='Sensore online';banner.classList.remove('show');
   } else {
-    st.className  = 'sensor-status err';
-    dot.className = 's-dot';
-    txt.textContent = 'Sensore offline';
-    banner.classList.add('show');
-    if(port) document.getElementById('portLabel').textContent = port;
-    document.getElementById('offlineMeta').textContent =
-      `Ultimo errore: ${new Date().toLocaleTimeString('it-IT')}`;
-    // Azzera KPI
+    st.className='sensor-status err';dot.className='s-dot';
+    txt.textContent='Sensore offline';banner.classList.add('show');
+    if(port) document.getElementById('portLabel').textContent=port;
+    document.getElementById('offlineMeta').textContent=`Ultimo errore: ${new Date().toLocaleTimeString('it-IT')}`;
     ['kV','kA','kW','kE','kAP','kRP','kHz','kPF'].forEach(id=>{
-      const el=document.getElementById(id); if(el) el.textContent='–';
+      const el=document.getElementById(id);if(el) el.textContent='–';
     });
-    gauge('gV',0); gauge('gW',0); gauge('gPF',0);
+    gauge('gV',0);gauge('gW',0);gauge('gPF',0);
     ['gVv','gWv','gPFv'].forEach(id=>{
-      const el=document.getElementById(id); if(el) el.textContent='–';
+      const el=document.getElementById(id);if(el) el.textContent='–';
     });
   }
 };
@@ -827,93 +666,67 @@ const delta = (k, v) => {
   if(prevVals[k]===undefined){prevVals[k]=v;return '–'}
   const d = v - prevVals[k]; prevVals[k]=v;
   if(Math.abs(d)<0.001) return '→ stabile';
-  return d>0 ? `▲ +${d.toFixed(2)}` : `▼ ${d.toFixed(2)}`;
+  return d>0?`▲ +${d.toFixed(2)}`:`▼ ${d.toFixed(2)}`;
 };
-const setText = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+const setText = (id, val) => {const e=document.getElementById(id);if(e) e.textContent=val;};
 
 const fetchLatest = async () => {
   try {
     const r = await fetch(API+'/latest');
     if(!r.ok) throw new Error();
     const j = await r.json();
-
-    if(!j.online || !j.data){
-      setOnline(false);
-      return;
-    }
+    if(!j.online||!j.data){setOnline(false);return;}
     const d = j.data;
     setOnline(true);
-
     setText('tsLabel', d.timestamp.replace('T',' '));
     setText('kpiBadge', d.timestamp.replace('T',' ').slice(11));
     setText('liveBadge', `${d.timestamp.replace('T',' ').slice(11)} · ${LIVE_WIN} camp.`);
-
-    setText('kV',  d.voltage);      setText('kVd', delta('v',+d.voltage));
-    setText('kA',  d.current);      setText('kAd', delta('a',+d.current));
-    setText('kW',  d.power);        setText('kWd', delta('w',+d.power));
-    setText('kE',  d.energy);
-    setText('kAP', d.apparent_power); setText('kAPd', delta('ap',+d.apparent_power));
-    setText('kRP', d.reactive_power);
-    setText('kHz', d.frequency);
-    setText('kPF', d.power_factor);
-
-    setText('bV',  d.voltage+'V');
-    setText('bA',  d.current+'A');
-    setText('bW',  d.power+'W');
-    setText('bHz', d.frequency+'Hz');
-    setText('bE',  d.energy+'Wh');
-
-    gauge('gV',  (+d.voltage - 195) / 55);
-    gauge('gW',  +d.power / 3000);
-    gauge('gPF', +d.power_factor);
-    setText('gVv',  d.voltage);
-    setText('gWv',  d.power);
-    setText('gPFv', d.power_factor);
-
-    // Allarme
+    setText('kV',d.voltage);   setText('kVd',delta('v',+d.voltage));
+    setText('kA',d.current);   setText('kAd',delta('a',+d.current));
+    setText('kW',d.power);     setText('kWd',delta('w',+d.power));
+    setText('kE',d.energy);
+    setText('kAP',d.apparent_power); setText('kAPd',delta('ap',+d.apparent_power));
+    setText('kRP',d.reactive_power);
+    setText('kHz',d.frequency);
+    setText('kPF',d.power_factor);
+    setText('bV',d.voltage+'V');setText('bA',d.current+'A');setText('bW',d.power+'W');
+    setText('bHz',d.frequency+'Hz');setText('bE',d.energy+'Wh');
+    gauge('gV',(+d.voltage-195)/55);
+    gauge('gW',+d.power/3000);
+    gauge('gPF',+d.power_factor);
+    setText('gVv',d.voltage);setText('gWv',d.power);setText('gPFv',d.power_factor);
     if(+d.alarm){
       document.getElementById('offlineBanner').classList.add('show');
-      document.querySelector('.offline-msg').innerHTML =
-        '<strong>⚡ ALLARME POTENZA</strong> — Soglia di potenza superata!';
+      document.querySelector('.offline-msg').innerHTML='<strong>⚡ ALLARME POTENZA</strong> — Soglia superata!';
     }
-
-  } catch {
-    setOnline(false);
-  }
+  } catch {setOnline(false);}
 };
 
+// FIX PERFORMANCE: aggiornamento bulk dei chart live in un'unica passata
 const fetchLive = async () => {
   try {
     const r = await fetch(API+'/live');
     const rows = await r.json();
     if(!rows.length) return;
 
-    const rebuild = (ch, fn) => {
-      ch.data.labels=[]; ch.data.datasets.forEach(ds=>ds.data=[]);
-      rows.forEach(fn); ch.update('none');
-    };
+    // Sottocampiona se troppi punti (max 200 punti per chart live)
+    const step = Math.max(1, Math.floor(rows.length / 200));
+    const s = rows.filter((_,i)=>i%step===0);
 
-    rebuild(CV, row => {
-      const l=row.timestamp.slice(11,19);
-      CV.data.labels.push(l); CV.data.datasets[0].data.push(+row.voltage);
-    });
-    rebuild(CA, row => {
-      CA.data.labels.push(row.timestamp.slice(11,19));
-      CA.data.datasets[0].data.push(+row.current);
-    });
-    rebuild(CP, row => {
-      CP.data.labels.push(row.timestamp.slice(11,19));
-      CP.data.datasets[0].data.push(+row.power);
-      CP.data.datasets[1].data.push(+row.apparent_power);
-    });
-    rebuild(CF, row => {
-      CF.data.labels.push(row.timestamp.slice(11,19));
-      CF.data.datasets[0].data.push(+row.frequency);
-    });
-    rebuild(CE, row => {
-      CE.data.labels.push(row.timestamp.slice(11,19));
-      CE.data.datasets[0].data.push(+row.energy);
-    });
+    const lbl = s.map(r=>r.timestamp.slice(11,19));
+    const v   = s.map(r=>+r.voltage);
+    const a   = s.map(r=>+r.current);
+    const p   = s.map(r=>+r.power);
+    const ap  = s.map(r=>+r.apparent_power);
+    const hz  = s.map(r=>+r.frequency);
+    const en  = s.map(r=>+r.energy);
+
+    // Aggiorna dati senza animazione (performance)
+    CV.data.labels=lbl; CV.data.datasets[0].data=v; CV.update('none');
+    CA.data.labels=lbl; CA.data.datasets[0].data=a; CA.update('none');
+    CP.data.labels=lbl; CP.data.datasets[0].data=p; CP.data.datasets[1].data=ap; CP.update('none');
+    CF.data.labels=lbl; CF.data.datasets[0].data=hz; CF.update('none');
+    CE.data.labels=lbl; CE.data.datasets[0].data=en; CE.update('none');
   } catch {}
 };
 
@@ -921,138 +734,147 @@ const fetchLive = async () => {
 //  STORICO
 // ═══════════════════════════════════════════════
 let histField = 'power';
-const FCOLS = {power:'#a89060',voltage:'#6b8cba',current:'#8b7aaa',
-               energy:'#5a8870',frequency:'#607080',power_factor:'#9a6878'};
-const FLBLS = {power:'Potenza (W)',voltage:'Tensione (V)',current:'Corrente (A)',
-               energy:'Energia (Wh)',frequency:'Frequenza (Hz)',power_factor:'Fattore Potenza'};
+const FCOLS={power:'#a89060',voltage:'#6b8cba',current:'#8b7aaa',energy:'#5a8870',frequency:'#607080',power_factor:'#9a6878'};
+const FLBLS={power:'Potenza (W)',voltage:'Tensione (V)',current:'Corrente (A)',energy:'Energia (Wh)',frequency:'Frequenza (Hz)',power_factor:'Fattore Potenza'};
 
 const loadHistory = async (field='power') => {
   histField = field;
   document.querySelectorAll('#histTabs .tab').forEach(b => {
-    b.classList.toggle('on', b.textContent.trim().toLowerCase() ===
-      (field==='power_factor'?'cosφ':field==='frequency'?'frequenza':
-       field==='energy'?'energia':field==='current'?'corrente':
-       field==='voltage'?'tensione':'potenza'));
+    const map={'power':'potenza','voltage':'tensione','current':'corrente',
+               'energy':'energia','frequency':'frequenza','power_factor':'cosφ'};
+    b.classList.toggle('on', b.textContent.trim().toLowerCase()===(map[field]||field));
   });
   try {
     const r = await fetch(API+'/history');
     const rows = await r.json();
-    if(!rows.length){ setText('histBadge','Nessun dato'); return; }
-    const step = Math.max(1, Math.floor(rows.length/800));
+    if(!rows.length){setText('histBadge','Nessun dato');return;}
+    // FIX PERFORMANCE: cap a 800 punti per non bloccare il browser
+    const step = Math.max(1,Math.floor(rows.length/800));
     const s = rows.filter((_,i)=>i%step===0);
     CH.data.labels = s.map(r=>r.timestamp.slice(0,16).replace('T',' '));
     CH.data.datasets[0].data = s.map(r=>+r[field]);
-    CH.data.datasets[0].borderColor = FCOLS[field];
-    CH.data.datasets[0].backgroundColor = FCOLS[field]+'12';
-    CH.update();
-    setText('histTitle', FLBLS[field]+' – Storico');
-    setText('histBadge', `${rows.length} campioni`);
-    setText('ftStats', `Storico: ${rows.length} righe · dal ${rows[0]?.timestamp?.slice(0,10)||'–'}`);
-  } catch { setText('histBadge','Errore'); }
+    CH.data.datasets[0].borderColor=FCOLS[field];
+    CH.data.datasets[0].backgroundColor=FCOLS[field]+'12';
+    CH.update('none'); // nessuna animazione per dataset grandi
+    setText('histTitle',FLBLS[field]+' – Storico');
+    setText('histBadge',`${rows.length} campioni`);
+    setText('ftStats',`Storico: ${rows.length} righe · dal ${rows[0]?.timestamp?.slice(0,10)||'–'}`);
+  } catch {setText('histBadge','Errore');}
 };
 
 // ═══════════════════════════════════════════════
-//  ANALYTICS
+//  ANALYTICS — caricamento parallelo
 // ═══════════════════════════════════════════════
 
-// Statistiche descrittive
 const loadStats = async () => {
   try {
     const r = await fetch(API+'/analytics/stats');
     const d = await r.json();
-    if(!Object.keys(d).length){ document.getElementById('statsContent').innerHTML='<div class="empty">Dati insufficienti per le statistiche.</div>'; return; }
-
-    const labels = {voltage:'Tensione',current:'Corrente',power:'Pot. Attiva',
-      energy:'Energia',frequency:'Frequenza',power_factor:'Fattore Pot.',
-      apparent_power:'Pot. Apparente',reactive_power:'Pot. Reattiva'};
-    const units  = {voltage:'V',current:'A',power:'W',energy:'Wh',
-      frequency:'Hz',power_factor:'',apparent_power:'VA',reactive_power:'VAR'};
-
-    let html = `<div style="overflow-x:auto"><table class="stat-table">
-      <thead><tr>
-        <th>Grandezza</th><th>Min</th><th>Medio</th><th>Mediana</th><th>Max</th><th>Dev.Std</th><th>N</th>
-      </tr></thead><tbody>`;
-
-    for(const [k,v] of Object.entries(d)){
-      const u = units[k]||'';
-      html += `<tr>
-        <td><span class="stat-field">${labels[k]||k}</span></td>
-        <td class="stat-num">${v.min} ${u}</td>
-        <td class="stat-num">${v.mean} ${u}</td>
-        <td class="stat-num">${v.median} ${u}</td>
-        <td class="stat-num">${v.max} ${u}</td>
-        <td class="stat-num">${v.std}</td>
-        <td class="stat-num">${v.count}</td>
-      </tr>`;
+    if(!Object.keys(d).length){
+      document.getElementById('statsContent').innerHTML='<div class="empty">Dati insufficienti.</div>';return;
     }
-    html += '</tbody></table></div>';
-    document.getElementById('statsContent').innerHTML = html;
-    setText('statsBadge', `${d.power?.count||0} campioni analizzati`);
-  } catch { document.getElementById('statsContent').innerHTML='<div class="empty">Errore nel caricamento delle statistiche.</div>'; }
+    const labels={voltage:'Tensione',current:'Corrente',power:'Pot. Attiva',energy:'Energia',
+      frequency:'Frequenza',power_factor:'Fattore Pot.',apparent_power:'Pot. Apparente',reactive_power:'Pot. Reattiva'};
+    const units={voltage:'V',current:'A',power:'W',energy:'Wh',frequency:'Hz',
+      power_factor:'',apparent_power:'VA',reactive_power:'VAR'};
+    let html=`<div style="overflow-x:auto"><table class="stat-table"><thead><tr>
+      <th>Grandezza</th><th>Min</th><th>Medio</th><th>Mediana</th><th>Max</th><th>Dev.Std</th><th>N</th>
+    </tr></thead><tbody>`;
+    for(const [k,v] of Object.entries(d)){
+      const u=units[k]||'';
+      html+=`<tr><td><span class="stat-field">${labels[k]||k}</span></td>
+        <td class="stat-num">${v.min} ${u}</td><td class="stat-num">${v.mean} ${u}</td>
+        <td class="stat-num">${v.median} ${u}</td><td class="stat-num">${v.max} ${u}</td>
+        <td class="stat-num">${v.std}</td><td class="stat-num">${v.count}</td></tr>`;
+    }
+    html+='</tbody></table></div>';
+    document.getElementById('statsContent').innerHTML=html;
+    setText('statsBadge',`${d.power?.count||0} campioni analizzati`);
+  } catch {document.getElementById('statsContent').innerHTML='<div class="empty">Errore caricamento statistiche.</div>';}
 };
 
-// Profilo picchi
 const loadPeaks = async () => {
   try {
     const r = await fetch(API+'/analytics/peak_hours');
     const rows = await r.json();
     if(!rows.length) return;
-    CPeak.data.labels = rows.map(r=>r.hour+':00');
-    CPeak.data.datasets[0].data = rows.map(r=>r.avg_power);
-    CPeak.update();
+    CPeak.data.labels=rows.map(r=>r.hour+':00');
+    CPeak.data.datasets[0].data=rows.map(r=>r.avg_power);
+    CPeak.update('none');
   } catch {}
 };
 
-// Consumo giornaliero
 const loadDaily = async () => {
   try {
     const r = await fetch(API+'/analytics/daily');
     const rows = await r.json();
     if(!rows.length) return;
-    const last = rows.slice(-30);
-    CDaily.data.labels = last.map(r=>r.day.slice(5));
-    CDaily.data.datasets[0].data = last.map(r=>r.energy_wh);
-    CDaily.update();
+    const last=rows.slice(-30);
+    CDaily.data.labels=last.map(r=>r.day.slice(5));
+    CDaily.data.datasets[0].data=last.map(r=>r.energy_wh);
+    CDaily.update('none');
   } catch {}
 };
 
-// Previsione
+// FIX FORECAST: dataset separati con labels uniche, niente null interlacciati
 const loadForecast = async () => {
   try {
     const r = await fetch(API+'/analytics/forecast?days=7');
     const d = await r.json();
     if(d.error){
-      document.getElementById('fcTable').innerHTML = `<div class="empty">${d.error}</div>`;
+      document.getElementById('fcTable').innerHTML=`<div class="empty">${d.error}</div>`;
       return;
     }
-    // Chart
     const hist = d.historical.slice(-20);
     const fc   = d.forecast;
-    const maxVal = Math.max(...hist.map(h=>h.energy_wh), ...fc.map(f=>f.upper));
 
-    CForecast.data.labels = [...hist.map(h=>h.day.slice(5)), ...fc.map(f=>f.day.slice(5))];
-    CForecast.data.datasets[0].data = [...hist.map(h=>h.energy_wh), ...Array(fc.length).fill(null)];
-    CForecast.data.datasets[1].data = [...Array(hist.length).fill(null), ...fc.map(f=>f.predicted_wh)];
+    if(!hist.length && !fc.length){
+      document.getElementById('fcTable').innerHTML='<div class="empty">Dati insufficienti</div>';
+      return;
+    }
+
+    // Labels unite (storico + previsione)
+    const histLabels = hist.map(h=>h.day.slice(5));
+    const fcLabels   = fc.map(f=>f.day.slice(5));
+    const allLabels  = [...histLabels, ...fcLabels];
+
+    // Dataset storico: valori reali per le prime N labels, poi null
+    const histData = [...hist.map(h=>h.energy_wh), ...Array(fcLabels.length).fill(null)];
+    // Dataset previsione: null per le prime N labels, poi i valori forecast
+    // Aggiunge l'ultimo punto storico come "punto di giunzione" per continuità visiva
+    const lastHistVal = hist.length ? hist[hist.length-1].energy_wh : null;
+    const fcData = [
+      ...Array(histLabels.length - 1).fill(null),
+      lastHistVal,
+      ...fc.map(f=>f.predicted_wh)
+    ];
+
+    CForecast.data.labels = allLabels;
+    CForecast.data.datasets[0].data = histData;
+    CForecast.data.datasets[1].data = fcData;
     CForecast.update();
 
-    setText('fcR2', `R²: ${d.model.r2}`);
+    setText('fcR2',`R²: ${d.model.r2}`);
 
-    // Tabella
-    let html = '';
+    const maxVal = Math.max(...hist.map(h=>h.energy_wh), ...fc.map(f=>f.upper||f.predicted_wh));
+    let html='';
     for(const f of fc){
-      const pct = maxVal>0 ? (f.predicted_wh/maxVal*100).toFixed(1) : 0;
-      html += `<div class="fc-row">
+      const pct = maxVal>0?(f.predicted_wh/maxVal*100).toFixed(1):0;
+      html+=`<div class="fc-row">
         <span class="fc-day">${f.day}</span>
         <div class="fc-bar-wrap"><div class="fc-bar" style="width:${pct}%"></div></div>
         <span class="fc-val">${f.predicted_wh} Wh<br><span class="fc-range">${f.lower}–${f.upper}</span></span>
       </div>`;
     }
-    document.getElementById('fcTable').innerHTML = html||'<div class="empty">–</div>';
-    setText('fcBadge',`Trend: ${d.model.slope_wh_per_day>0?'▲':'▼'} ${Math.abs(d.model.slope_wh_per_day)} Wh/giorno · MAE ${d.model.mae_wh} Wh`);
-  } catch {}
+    document.getElementById('fcTable').innerHTML=html||'<div class="empty">–</div>';
+    const slope=d.model.slope_wh_per_day;
+    setText('fcBadge',`Trend: ${slope>0?'▲':'▼'} ${Math.abs(slope)} Wh/giorno · MAE ${d.model.mae_wh} Wh`);
+  } catch(e){
+    console.error('Forecast error:',e);
+    document.getElementById('fcTable').innerHTML='<div class="empty">Errore caricamento previsioni.</div>';
+  }
 };
 
-// Costi
 const loadCost = async () => {
   const price = parseFloat(document.getElementById('priceInput').value)||0.190262;
   try {
@@ -1062,43 +884,33 @@ const loadCost = async () => {
       document.getElementById('costCards').innerHTML='<div class="empty" style="grid-column:1/-1">Dati insufficienti.</div>';
       return;
     }
-    document.getElementById('costCards').innerHTML = `
-      <div class="cost-card">
-        <div class="cost-period">Periodo osservato</div>
+    document.getElementById('costCards').innerHTML=`
+      <div class="cost-card"><div class="cost-period">Periodo osservato</div>
         <div class="cost-kwh">${d.total_kwh} kWh</div>
-        <div class="cost-eur">€ ${d.total_cost_eur} · ${d.total_days} giorni</div>
-      </div>
-      <div class="cost-card">
-        <div class="cost-period">Proiezione mensile</div>
+        <div class="cost-eur">€ ${d.total_cost_eur} · ${d.total_days} giorni</div></div>
+      <div class="cost-card"><div class="cost-period">Proiezione mensile</div>
         <div class="cost-kwh">${d.projected_monthly_kwh} kWh</div>
-        <div class="cost-eur">€ ${d.projected_monthly_cost_eur} / mese</div>
-      </div>
-      <div class="cost-card">
-        <div class="cost-period">Proiezione annuale</div>
+        <div class="cost-eur">€ ${d.projected_monthly_cost_eur} / mese</div></div>
+      <div class="cost-card"><div class="cost-period">Proiezione annuale</div>
         <div class="cost-kwh">${d.projected_yearly_kwh} kWh</div>
-        <div class="cost-eur">€ ${d.projected_yearly_cost_eur} / anno</div>
-      </div>`;
-
-    // Bar chart ultimi 30gg
-    const daily = d.daily_breakdown||[];
-    CCostDaily.data.labels = daily.map(d=>d.day.slice(5));
-    CCostDaily.data.datasets[0].data = daily.map(d=>d.energy_wh);
-    CCostDaily.update();
+        <div class="cost-eur">€ ${d.projected_yearly_cost_eur} / anno</div></div>`;
+    const daily=d.daily_breakdown||[];
+    CCostDaily.data.labels=daily.map(d=>d.day.slice(5));
+    CCostDaily.data.datasets[0].data=daily.map(d=>d.energy_wh);
+    CCostDaily.update('none');
   } catch {}
 };
 
-// Anomalie
 const loadAnomalies = async () => {
   try {
     const r = await fetch(API+'/analytics/anomalies');
     const rows = await r.json();
-    setText('anomBadge', `${rows.length} rilevate (z > 3σ)`);
+    setText('anomBadge',`${rows.length} rilevate (z > 3σ)`);
     if(!rows.length){
-      document.getElementById('anomList').innerHTML='<div class="empty">Nessuna anomalia rilevata. ✓</div>';
-      return;
+      document.getElementById('anomList').innerHTML='<div class="empty">Nessuna anomalia. ✓</div>';return;
     }
-    const units = {voltage:'V',current:'A',power:'W',frequency:'Hz'};
-    document.getElementById('anomList').innerHTML =
+    const units={voltage:'V',current:'A',power:'W',frequency:'Hz'};
+    document.getElementById('anomList').innerHTML=
       `<div class="anomaly-list">${rows.map(a=>`
         <div class="anomaly-item ${a.z_score>5?'high':''}">
           <span class="a-ts">${a.timestamp.replace('T',' ')}</span>
@@ -1110,49 +922,58 @@ const loadAnomalies = async () => {
   } catch {}
 };
 
-// Status
 const fetchStatus = async () => {
   try {
     const r = await fetch(API+'/status');
     const d = await r.json();
-    setText('ftPort', `Porta: ${d.serial_port} · Poll: ${d.poll_every}s`);
+    setText('ftPort',`Porta: ${d.serial_port} · Poll: ${d.poll_every}s`);
   } catch {}
 };
+
+// FIX PERFORMANCE: caricamento analytics in parallelo con Promise.all
+// invece di chiamate sequenziali che si bloccano l'una con l'altra
+const loadAllAnalytics = () => Promise.all([
+  loadStats(),
+  loadPeaks(),
+  loadDaily(),
+  loadForecast(),
+  loadCost(),
+  loadAnomalies(),
+]);
 
 // ═══════════════════════════════════════════════
 //  INFO POPUP
 // ═══════════════════════════════════════════════
 const INFO = {
-  voltage: {sup:'Grandezza elettrica',title:'Tensione',color:'#6b8cba',unit:'V — Volt',
+  voltage:{sup:'Grandezza elettrica',title:'Tensione',color:'#6b8cba',unit:'V — Volt',
     body:`È la <strong>"pressione"</strong> con cui l'elettricità arriva alla presa. In Italia la rete domestica è a <strong>230 V nominali</strong>. Valori fuori dalla fascia 210–250 V indicano un problema di rete.`},
-  current: {sup:'Grandezza elettrica',title:'Corrente',color:'#8b7aaa',unit:'A — Ampere',
+  current:{sup:'Grandezza elettrica',title:'Corrente',color:'#8b7aaa',unit:'A — Ampere',
     body:`Quanta corrente sta <strong>scorrendo nel cavo</strong>. Più il carico consuma, più la corrente è alta. Un forno da 2 kW a 230 V assorbe circa <strong>8–9 A</strong>.`},
-  power:   {sup:'Grandezza elettrica',title:'Potenza Attiva',color:'#a89060',unit:'W — Watt',
+  power:{sup:'Grandezza elettrica',title:'Potenza Attiva',color:'#a89060',unit:'W — Watt',
     body:`La potenza che il carico <strong>trasforma realmente in lavoro utile</strong>. Quella indicata sulle etichette degli elettrodomestici e sulla bolletta. Formula: <strong>V × I × cosφ</strong>.`},
   apparent:{sup:'Grandezza elettrica',title:'Potenza Apparente',color:'#8a7860',unit:'VA — Volt-Ampere',
     body:`Il prodotto grezzo <strong>V × I</strong> senza correzione del fattore di potenza. Su carichi resistivi puri coincide con la potenza attiva; su motori e alimentatori può essere significativamente maggiore.`},
   reactive:{sup:'Grandezza elettrica',title:'Potenza Reattiva',color:'#7a6890',unit:'VAR — Volt-Ampere Reattivi',
-    body:`La quota di energia che <strong>oscilla tra rete e carico</strong> senza compiere lavoro utile. Tipica di motori, trasformatori e condensatori. Non compare direttamente in bolletta domestica ma sollecita la rete.`},
-  energy:  {sup:'Grandezza elettrica',title:'Energia',color:'#5a8870',unit:'Wh — Wattora',
+    body:`La quota di energia che <strong>oscilla tra rete e carico</strong> senza compiere lavoro utile. Tipica di motori, trasformatori e condensatori.`},
+  energy:{sup:'Grandezza elettrica',title:'Energia',color:'#5a8870',unit:'Wh — Wattora',
     body:`Il <strong>contatore dei consumi</strong> dall'accensione del sensore. <strong>1000 Wh = 1 kWh</strong>, che corrisponde mediamente a circa 0,25 € in bolletta italiana.`},
   frequency:{sup:'Grandezza elettrica',title:'Frequenza',color:'#607080',unit:'Hz — Hertz',
-    body:`Quante volte al secondo la corrente alterna la propria direzione. In Europa è fissata a <strong>50 Hz</strong>. Variazioni superiori a ±0,2 Hz indicano squilibri sulla rete nazionale — evento rarissimo.`},
-  pf:      {sup:'Grandezza elettrica',title:'Fattore di Potenza',color:'#9a6878',unit:'cosφ — adimensionale, 0 ÷ 1',
-    body:`Misura l'<strong>efficienza del carico</strong> dal punto di vista della rete. <strong>1.0</strong> = carico puramente resistivo (stufa, bollitore). <strong>0.6–0.8</strong> = carichi con componente reattiva (motori, PC, caricatori switching). Più basso è, più capacità della rete viene "sprecata".`},
+    body:`Quante volte al secondo la corrente alterna la propria direzione. In Europa è fissata a <strong>50 Hz</strong>. Variazioni superiori a ±0,2 Hz indicano squilibri sulla rete nazionale.`},
+  pf:{sup:'Grandezza elettrica',title:'Fattore di Potenza',color:'#9a6878',unit:'cosφ — adimensionale, 0 ÷ 1',
+    body:`Misura l'<strong>efficienza del carico</strong> dal punto di vista della rete. <strong>1.0</strong> = carico puramente resistivo. <strong>0.6–0.8</strong> = carichi con componente reattiva (motori, PC, caricatori switching).`},
 };
 
 const showInfo = (key) => {
-  const d = INFO[key]; if(!d) return;
-  const p = document.getElementById('popup');
-  p.style.setProperty('--pc', d.color);
-  document.getElementById('popupBar').style.background = d.color;
-  document.getElementById('popupSup').style.color = d.color;
-  document.getElementById('popupUnit').style.color = d.color;
-  document.getElementById('popupUnit').style.borderColor = '#2a2a2e';
-  setText('popupSup',   d.sup);
-  setText('popupTitle', d.title);
-  document.getElementById('popupBody').innerHTML = d.body;
-  setText('popupUnit',  d.unit);
+  const d=INFO[key];if(!d) return;
+  const p=document.getElementById('popup');
+  p.style.setProperty('--pc',d.color);
+  document.getElementById('popupBar').style.background=d.color;
+  document.getElementById('popupSup').style.color=d.color;
+  document.getElementById('popupUnit').style.color=d.color;
+  document.getElementById('popupUnit').style.borderColor='#2a2a2e';
+  setText('popupSup',d.sup);setText('popupTitle',d.title);
+  document.getElementById('popupBody').innerHTML=d.body;
+  setText('popupUnit',d.unit);
   document.getElementById('overlay').classList.add('open');
   document.body.style.overflow='hidden';
 };
@@ -1160,34 +981,27 @@ const closePopupDirect = () => {
   document.getElementById('overlay').classList.remove('open');
   document.body.style.overflow='';
 };
-const closePopup = e => { if(e.target===document.getElementById('overlay')) closePopupDirect(); };
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePopupDirect(); });
+const closePopup = e => {if(e.target===document.getElementById('overlay')) closePopupDirect();};
+document.addEventListener('keydown', e=>{if(e.key==='Escape') closePopupDirect();});
 
-// ═══════════════════════════════════════════════
-//  DOWNLOAD
-// ═══════════════════════════════════════════════
 const downloadTSV = () => window.open(API+'/download','_blank');
 
 // ═══════════════════════════════════════════════
-//  BOOT
+//  BOOT — primo caricamento parallelo
 // ═══════════════════════════════════════════════
-fetchLatest();
-fetchLive();
-fetchStatus();
-loadHistory('power');
+Promise.all([
+  fetchLatest(),
+  fetchLive(),
+  fetchStatus(),
+  loadHistory('power'),
+  loadAllAnalytics(),
+]);
 
-// Analytics (potrebbero richiedere dati storici)
-loadStats();
-loadPeaks();
-loadDaily();
-loadForecast();
-loadCost();
-loadAnomalies();
-
+// Polling
 setInterval(fetchLatest, POLL_LIVE);
 setInterval(fetchLive,   POLL_LIVE);
 setInterval(()=>loadHistory(histField), POLL_HIST);
-setInterval(()=>{ loadStats(); loadPeaks(); loadDaily(); loadForecast(); loadAnomalies(); }, POLL_ANALYTICS);
+setInterval(loadAllAnalytics, POLL_ANALYTICS);
 setInterval(fetchStatus, 15000);
 </script>
 </body>
