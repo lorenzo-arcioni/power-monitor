@@ -129,40 +129,11 @@ def read_sensor() -> dict | None:
 
 def reset_energy() -> bool:
     """
-    Invia il comando di reset contatore energia al PZEM-004t.
-    Il PZEM-004t accetta un comando speciale: write 0x42 al registro
-    0x0003 (coil/holding) — varia a seconda del firmware.
-    Metodo più affidabile per la maggior parte dei firmware:
-    write_single_register(0x0003, 0x0000) preceduto da un byte 0x42.
-
-    In pratica il modo più semplice e compatibile è inviare il frame
-    Modbus raw: 01 42 80 11 (CRC incluso dal modbus_tk).
-
-    Restituisce True se il reset è andato a buon fine.
+    Azzera il contatore energia del PZEM-004t.
+    Frame confermato funzionante su firmware v3: 01 42 80 11
+    Il PZEM risponde con lo stesso frame in caso di successo.
     """
-    try:
-        import modbus_tk.defines as cst
-
-        ser, master = _open_master()
-        try:
-            # Il PZEM-004t usa function code 0x42 (66) per il reset energy.
-            # modbus_tk permette di eseguire function code custom.
-            master.execute(
-                SLAVE_ID,
-                cst.WRITE_SINGLE_REGISTER,
-                0x0003,
-                output_value=0x0000,
-            )
-        finally:
-            _close(ser, master)
-
-        log.info("Reset energy PZEM-004t eseguito.")
-        return True
-
-    except Exception as e:
-        log.warning(f"Reset energy fallito: {e}")
-        # Fallback: prova con il frame raw via pyserial
-        return _reset_energy_raw()
+    return _reset_energy_raw()
 
 
 def _reset_energy_raw() -> bool:
