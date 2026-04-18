@@ -80,7 +80,29 @@ def queue_tsv(row: dict):
             _flush_buf(_write_buf)
 
 
-# ── Thread di polling sensore ─────────────────────────────────────────────────
+# Limiti fisici PZEM-004t — valori fuori range sono glitch Modbus
+_LIMITS = {
+    'voltage':       (80.0,   260.0),
+    'current':       (0.0,    100.0),
+    'power':         (0.0,  23000.0),
+    'energy':        (0.0, 9999999.0),
+    'frequency':     (45.0,   65.0),
+    'power_factor':  (0.0,    1.0),
+    'apparent_power':(0.0,  23000.0),
+    'reactive_power':(0.0,  23000.0),
+}
+
+def _validate(row: dict) -> bool:
+    """Restituisce True se tutti i campi numerici sono nei limiti fisici."""
+    try:
+        for field, (lo, hi) in _LIMITS.items():
+            val = float(row.get(field, 0) or 0)
+            if not (lo <= val <= hi):
+                log.warning(f"Valore fuori range scartato: {field}={val}")
+                return False
+        return True
+    except (ValueError, TypeError):
+        return False
 
 def poll_loop():
     global sensor_online
@@ -88,7 +110,7 @@ def poll_loop():
     while True:
         row = reader.read_sensor()
         with lock:
-            if row:
+            if row and _validate(row):
                 sensor_online = True
                 latest.clear()
                 latest.update(row)
